@@ -240,7 +240,7 @@ class Memory:
         # NEW: Add scope tracking
         self.scope = ScopeManager()
     
-    def push(self, role, content):
+    def push(self, role, content, auto_add_to_scope: bool = True):
         """Add a message to conversation history with scope detection"""
         time_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         self.messages.append({
@@ -250,7 +250,7 @@ class Memory:
         })
         
         # NEW: Auto-detect scope items in user messages
-        if role == 'user':
+        if auto_add_to_scope and role == 'user':
             detected = self.scope.auto_detect_and_add(content)
             if detected:
                 # Optionally log scope additions
