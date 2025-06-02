@@ -74,37 +74,6 @@ The project uses the following directory structure:
 *   `tools/`: Includes tools and utilities that agents can use.
 *   `prompts/`: Stores prompt templates for the agents.
 
-## Contributing
-
-We welcome contributions to Breathless Symphony! If you'd like to contribute, please follow these guidelines:
-
-1.  **Fork the repository**: Create your own fork of the project on GitHub.
-2.  **Create a branch**: Make a new branch in your fork for your changes.
-    ```bash
-    git checkout -b feature/your-feature-name
-    ```
-3.  **Make your changes**: Implement your feature or bug fix.
-    *   Follow existing coding style and conventions.
-    *   Ensure your code is well-commented.
-4.  **Test your changes**:
-    *   Add unit tests for any new functionality.
-    *   Ensure all existing tests pass.
-5.  **Commit your changes**:
-    ```bash
-    git commit -m "Add concise and descriptive commit message"
-    ```
-6.  **Push to your fork**:
-    ```bash
-    git push origin feature/your-feature-name
-    ```
-7.  **Submit a pull request**: Open a pull request from your branch to the main Breathless Symphony repository.
-    *   Provide a clear description of your changes in the pull request.
-    *   Reference any relevant issues.
-
-We will review your pull request and provide feedback as soon as possible.
-
-## License
-
-This project is licensed under the [Your License Here] License.
-
-**Note**: Please update this section with the actual license you intend to use for this project. You can choose from various open-source licenses like MIT, Apache 2.0, GPL, etc. If you need help choosing a license, you can visit [https://choosealicense.com/](https://choosealicense.com/).
+## Disclaimer
+The creators and distributors of this tool accept no liability for any misuse or any direct or indirect damages arising therefrom.
+This framework is under development. Do not deploy within production environments.
