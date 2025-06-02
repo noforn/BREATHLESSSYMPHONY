@@ -10,6 +10,16 @@ Autonomous Agentic Framework
 *   **Prompt Management**: Generates initial prompt files for agents (e.g., `prompts/file_agent.txt`).
 *   **Dependency Management**: Creates a `requirements.txt` file with necessary Python packages.
 *   **Configuration Handling**: Uses `config.ini` for managing project settings, with sensible defaults provided in `config.py`.
+*   **Agents**:
+    *   `file_agent`: Manages file system operations, such as creating, reading, and writing files.
+    *   `recon_agent`: Gathers information and performs reconnaissance tasks.
+    *   `web_search_agent`: Conducts web searches to find relevant information.
+    *   `exploit_agent`: Identifies and utilizes vulnerabilities in systems.
+*   **Tools**:
+    *   `bash_executor`: Executes bash commands in the operating system.
+    *   `exploit_downloader`: Downloads exploits from various sources.
+    *   `file_finder`: Searches for files within the file system.
+    *   `web_search`: Performs web searches using search engines.
 
 ## Getting Started
 
@@ -32,6 +42,18 @@ To get started with this project, follow these steps:
     python main.py
     ```
 
+## Usage
+
+Once the assistant is running, you can interact with it by providing prompts or commands in the terminal. The assistant will then use its configured agents and tools to perform tasks and provide responses.
+
+For example, you can ask the assistant to:
+
+*   "Find all text files in the `~/documents` directory."
+*   "Search the web for information on a specific topic."
+*   "Create a new file named `notes.txt` with the content 'This is a new note.'."
+
+The assistant will process your request and respond accordingly. You can continue the conversation by providing further instructions or clarifications.
+
 ## Configuration
 
 The project uses a `config.ini` file to manage configurations. If the file doesn't exist, it will be created with default settings. Key configurations include:
@@ -51,3 +73,38 @@ The project uses the following directory structure:
 *   `agents/`: Houses the different AI agents.
 *   `tools/`: Includes tools and utilities that agents can use.
 *   `prompts/`: Stores prompt templates for the agents.
+
+## Contributing
+
+We welcome contributions to Breathless Symphony! If you'd like to contribute, please follow these guidelines:
+
+1.  **Fork the repository**: Create your own fork of the project on GitHub.
+2.  **Create a branch**: Make a new branch in your fork for your changes.
+    ```bash
+    git checkout -b feature/your-feature-name
+    ```
+3.  **Make your changes**: Implement your feature or bug fix.
+    *   Follow existing coding style and conventions.
+    *   Ensure your code is well-commented.
+4.  **Test your changes**:
+    *   Add unit tests for any new functionality.
+    *   Ensure all existing tests pass.
+5.  **Commit your changes**:
+    ```bash
+    git commit -m "Add concise and descriptive commit message"
+    ```
+6.  **Push to your fork**:
+    ```bash
+    git push origin feature/your-feature-name
+    ```
+7.  **Submit a pull request**: Open a pull request from your branch to the main Breathless Symphony repository.
+    *   Provide a clear description of your changes in the pull request.
+    *   Reference any relevant issues.
+
+We will review your pull request and provide feedback as soon as possible.
+
+## License
+
+This project is licensed under the [Your License Here] License.
+
+**Note**: Please update this section with the actual license you intend to use for this project. You can choose from various open-source licenses like MIT, Apache 2.0, GPL, etc. If you need help choosing a license, you can visit [https://choosealicense.com/](https://choosealicense.com/).
