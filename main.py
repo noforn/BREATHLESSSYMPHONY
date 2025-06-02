@@ -1,6 +1,3 @@
-# Enhanced version of main.py
-# This adds scope command examples and help text
-
 import asyncio
 import os
 import sys
@@ -16,6 +13,7 @@ from core.ui import ui
 from agents.file_agent import FileAgent
 from agents.recon_agent import ReconAgent
 from agents.web_search_agent import WebSearchAgent
+from agents.exploit_agent import ExploitAgent
 
 async def main():
     # Clear screen and show header
@@ -78,6 +76,13 @@ async def main():
             provider=provider,
             work_dir=work_dir,
             verbose=config.getboolean('MAIN', 'verbose')
+        ),
+        ExploitAgent(
+            name="Exploit Specialist",
+            prompt_path="prompts/exploit_agent.txt",
+            provider=provider,
+            work_dir=work_dir,
+            verbose=config.getboolean('MAIN', 'verbose')
         )
     ]
     
@@ -90,11 +95,12 @@ async def main():
     
     ui.separator()
     ui.status("All systems operational", "success")
-    ui.status("Agents loaded: File Operative, Recon Specialist, Research Agent", "info")
+    ui.status("Agents loaded: File Operative, Recon Specialist, Research Agent, Exploit Specialist", "info")
     ui.status("NEW: Scope tracking enabled for penetration testing", "info")
+    ui.status("NEW: Full exploitation pipeline ready", "info")
     ui.separator(thin=True)
     
-    # Show example commands with scope management
+    # Show example commands with scope management and exploitation
     examples = [
         # Scope management examples
         "show scope",
@@ -107,6 +113,13 @@ async def main():
         "Perform a light port scan on 192.168.1.0/24",
         "Search for CVE-2023-1234 exploits",
         "Search for Apache 2.4.49 vulnerabilities",
+        "",
+        # NEW: Exploitation examples
+        "Find and download exploits for CVE-2021-44228",
+        "Get Apache HTTP Server exploits from exploit-db", 
+        "Execute exploit against targets in scope",
+        "Set up listener and run reverse shell exploit",
+        "Find Log4j exploits and execute against scoped targets"
     ]
     
     print(f"{ui.colors['dim']}Example commands:{ui.colors['reset']}")
@@ -127,7 +140,7 @@ async def main():
                 print("")
                 ui.status("Terminating session", "info")
                 if not orchestrator.memory.scope.is_empty():
-                    ui.status("Scope data cleared", "warning")
+                    ui.status("Scope data will be cleared on exit", "warning")
                 print(f"{ui.colors['success']}\nSee you next time!{ui.colors['reset']}")
                 print(f"{ui.colors['dim']}Session ended{ui.colors['reset']}")
                 break
@@ -145,7 +158,7 @@ async def main():
                     "clear - Clear the screen", 
                     "help - Show this help message",
                     "",
-                    "Scope Management (NEW):",
+                    "Scope Management:",
                     "  scope/show scope - Display current penetration test scope",
                     "  add <target> to scope - Add IP/domain/network to scope",
                     "  remove <target> from scope - Remove target from scope", 
@@ -155,12 +168,22 @@ async def main():
                     "  File operations: create, read, search, bash commands",
                     "  Reconnaissance: nmap, dig, whois, network scanning",
                     "  Web search: find information, exploits, CVEs, research",
+                    "  Exploitation: download exploits, execute POCs, get shells",
                     "",
-                    "Penetration Testing Workflow:",
+                    "Full Penetration Testing Workflow:",
                     "  1. Add targets to scope: 'add 192.168.1.1 to scope'",
                     "  2. Reconnaissance: 'scan the targets in scope'",
                     "  3. Search exploits: 'find exploits for Apache 2.4.49'",
-                    "  4. Agents automatically focus on scoped targets"
+                    "  4. Download & execute: 'get CVE-2021-44228 exploit and run it'",
+                    "  5. Get shells: 'execute reverse shell exploit against scope'",
+                    "  6. All agents automatically focus on scoped targets",
+                    "",
+                    "Exploitation Examples:",
+                    "  • 'find CVE-2021-44228 exploits'",
+                    "  • 'download Apache exploits from exploit-db'", 
+                    "  • 'execute exploit against 192.168.1.100'",
+                    "  • 'get reverse shell on targets in scope'",
+                    "  • 'set up listener and run exploit'"
                 ]
                 for cmd in help_commands:
                     if cmd == "":
