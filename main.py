@@ -1,3 +1,6 @@
+# Enhanced version of main.py
+# This adds scope command examples and help text
+
 import asyncio
 import os
 import sys
@@ -17,7 +20,7 @@ from agents.web_search_agent import WebSearchAgent
 async def main():
     # Clear screen and show header
     ui.clear_screen()
-    ui.header("BreathlessSymphony", "Autonomous Agentic Framework")
+    ui.header("BreathlessSymphony", "Autonomous Penetration Testing Framework")
     
     ui.system_message("Initializing system components...")
     
@@ -88,21 +91,30 @@ async def main():
     ui.separator()
     ui.status("All systems operational", "success")
     ui.status("Agents loaded: File Operative, Recon Specialist, Research Agent", "info")
+    ui.status("NEW: Scope tracking enabled for penetration testing", "info")
     ui.separator(thin=True)
     
-    # Show example commands
+    # Show example commands with scope management
     examples = [
+        # Scope management examples
+        "show scope",
+        "add 192.168.1.1 to scope",
+        "clear scope",
+        "",
+        # Operation examples with scope context
         "List the files in my directory",
-        "Create a file called test.txt with hello world", 
-        "Conduct reconnaissance on target.com",
-        "Perform a light port scan on 192.168.1.1", 
-        "Search for current date",
-        "Search for exploits affecting Apache 2.4.49",
+        "Conduct reconnaissance on target.com", 
+        "Perform a light port scan on 192.168.1.0/24",
+        "Search for CVE-2023-1234 exploits",
+        "Search for Apache 2.4.49 vulnerabilities",
     ]
     
     print(f"{ui.colors['dim']}Example commands:{ui.colors['reset']}")
     for example in examples:
-        print(f"{ui.colors['dim']}  • {example}{ui.colors['reset']}")
+        if example == "":
+            print()
+        else:
+            print(f"{ui.colors['dim']}  • {example}{ui.colors['reset']}")
     
     ui.footer_help()
     
@@ -114,13 +126,15 @@ async def main():
             if user_input.lower() in ['quit', 'exit', 'bye']:
                 print("")
                 ui.status("Terminating session", "info")
+                if not orchestrator.memory.scope.is_empty():
+                    ui.status("Scope data cleared", "warning")
                 print(f"{ui.colors['success']}\nSee you next time!{ui.colors['reset']}")
                 print(f"{ui.colors['dim']}Session ended{ui.colors['reset']}")
                 break
             
             if user_input.lower() == 'clear':
                 ui.clear_screen()
-                ui.header("BreathlessSymphony", "Autonomous Agentic Framework")
+                ui.header("BreathlessSymphony", "Autonomous Penetration Testing Framework")
                 ui.footer_help()
                 continue
                 
@@ -131,10 +145,22 @@ async def main():
                     "clear - Clear the screen", 
                     "help - Show this help message",
                     "",
+                    "Scope Management (NEW):",
+                    "  scope/show scope - Display current penetration test scope",
+                    "  add <target> to scope - Add IP/domain/network to scope",
+                    "  remove <target> from scope - Remove target from scope", 
+                    "  clear scope - Clear all targets from scope",
+                    "",
                     "Agent capabilities:",
                     "  File operations: create, read, search, bash commands",
                     "  Reconnaissance: nmap, dig, whois, network scanning",
-                    "  Web search: find information, news, research topics"
+                    "  Web search: find information, exploits, CVEs, research",
+                    "",
+                    "Penetration Testing Workflow:",
+                    "  1. Add targets to scope: 'add 192.168.1.1 to scope'",
+                    "  2. Reconnaissance: 'scan the targets in scope'",
+                    "  3. Search exploits: 'find exploits for Apache 2.4.49'",
+                    "  4. Agents automatically focus on scoped targets"
                 ]
                 for cmd in help_commands:
                     if cmd == "":
