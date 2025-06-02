@@ -91,7 +91,7 @@ Always explain what you're searching for and provide clear summaries of the resu
             clean_answer = self.remove_reasoning_text(response)
             
             # Store response in memory
-            self.memory.push('assistant', clean_answer)
+            self.memory.push('assistant', clean_answer, auto_add_to_scope=False)
             
             # Execute search tools
             exec_success, feedback = self.execute_modules(response)
@@ -105,7 +105,7 @@ Always explain what you're searching for and provide clear summaries of the resu
             if not exec_success and feedback:
                 # Add retry feedback
                 retry_feedback = f"The search failed: {feedback}. Try a different search approach or simpler query."
-                self.memory.push('user', retry_feedback)
+                self.memory.push('user', retry_feedback, auto_add_to_scope=False)
                 retry_count += 1
                 if self.ui:
                     self.ui.status(f"Search failed, retrying... ({retry_count}/{max_retries})", "warning")
