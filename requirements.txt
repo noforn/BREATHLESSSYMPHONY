@@ -1,0 +1,7 @@
+requests>=2.28.0
+pypdf>=5.4.0
+colorama>=0.4.6
+pandas>=2.1.0
+duckduckgo_search
+numpy
+asyncio

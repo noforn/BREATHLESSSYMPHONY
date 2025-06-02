@@ -1,0 +1,7 @@
+2025-06-02 11:59:06,356 - memory.log - INFO - Memory compression system initialized.
+2025-06-02 11:59:06,962 - memory.log - INFO - Memory compression system initialized.
+2025-06-02 11:59:22,704 - memory.log - INFO - Memory compression system initialized.
+2025-06-02 11:59:23,100 - memory.log - INFO - Memory compression system initialized.
+2025-06-02 11:59:23,588 - memory.log - INFO - Memory compression system initialized.
+2025-06-02 12:00:05,891 - memory.log - INFO - Estimated context size for gemma3:27b: 32768 tokens.
+2025-06-02 12:00:31,395 - memory.log - INFO - Estimated context size for gemma3:27b: 32768 tokens.
