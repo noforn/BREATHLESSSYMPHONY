@@ -1,8 +1,8 @@
-# Production-Ready AgenticSeek Clone
+# Breathless Symphony
 
 ![Cover Image](Screenshot%20from%202025-06-02%2013-40-55.png)
 
-This project is a production-ready clone of AgenticSeek, designed to provide a robust framework for developing and running AI agents. It includes functionalities for managing configurations, setting up directory structures, and defining agent prompts.
+Autonomous Agentic Framework
 
 ## Features
 
@@ -19,9 +19,9 @@ To get started with this project, follow these steps:
     ```bash
     ollama serve
     ```
-2.  **Pull a model** (e.g., deepseek-r1:14b):
+2.  **Pull a model** (e.g., gemma3:27b):
     ```bash
-    ollama pull deepseek-r1:14b
+    ollama pull gemma3:27b
     ```
 3.  **Install requirements**:
     ```bash
