@@ -4,6 +4,13 @@
 import os
 import sys
 from datetime import datetime
+
+try:
+    import readline
+    READLINE_AVAILABLE = True
+except ImportError:
+    READLINE_AVAILABLE = False
+
 try:
     from colorama import init, Fore, Back, Style
     init(autoreset=True)
@@ -24,7 +31,17 @@ class BreathlessUI:
     
     def __init__(self):
         self.width = self._get_terminal_width()
+        self.readline_available = READLINE_AVAILABLE
         
+        if self.readline_available:
+            self.history_file = os.path.expanduser("~/.breathless_history")
+            if os.path.exists(self.history_file):
+                try:
+                    readline.read_history_file(self.history_file)
+                except Exception as e:
+                    # Could log this error if a logging mechanism exists
+                    pass # Ignore if history can't be read
+
         # Stealth color scheme - muted, covert tones
         if COLORAMA_AVAILABLE:
             self.colors = {
@@ -95,7 +112,18 @@ class BreathlessUI:
     def user_input(self, prompt="You"):
         """Get user input with styled prompt"""
         prompt_text = f"{self.colors['text']}{prompt}: {self.colors['reset']}"
-        return input(prompt_text).strip()
+        try:
+            user_command = input(prompt_text).strip()
+            if self.readline_available:
+                try:
+                    readline.write_history_file(self.history_file)
+                except Exception as e:
+                    # Could log this error if a logging mechanism exists
+                    pass # Ignore if history can't be written
+            return user_command
+        except Exception as e:
+            self.status(f"Error in input: {e}", "error")
+            return ""
     
     def agent_response(self, agent_name, message, thinking_time=None):
         """Display agent response with formatting"""
