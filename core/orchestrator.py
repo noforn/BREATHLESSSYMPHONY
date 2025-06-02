@@ -1,5 +1,8 @@
 import asyncio
 from core.memory import Memory
+import datetime
+
+now = datetime.datetime.now()
 
 class Orchestrator:
     """
@@ -17,6 +20,8 @@ class Orchestrator:
         
         # Main conversation memory
         system_prompt = f"""You are {agent_name}, a helpful AI assistant. 
+
+Current time: {now.strftime("%Y-%m-%d %H:%M:%S")}
 
 You can handle general conversation, but you also have access to specialized agents for specific tasks:
 - file_agent: For file operations, searching files, running bash commands
