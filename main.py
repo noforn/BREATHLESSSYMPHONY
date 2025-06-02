@@ -8,7 +8,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from config import Config
 from core.ollama_provider import OllamaProvider
-from core.orchestrator import Orchestrator
+from core.orchestrator import Orchestrator  # Using the improved orchestrator
 from core.ui import ui
 from agents.file_agent import FileAgent
 from agents.recon_agent import ReconAgent
@@ -18,9 +18,9 @@ from agents.exploit_agent import ExploitAgent
 async def main():
     # Clear screen and show header
     ui.clear_screen()
-    ui.header("BreathlessSymphony", "Autonomous Penetration Testing Framework")
+    ui.header("BreathlessSymphony", "Autonomous Penetration Testing Framework v2.0")
     
-    ui.system_message("Initializing system components...")
+    ui.system_message("Initializing enhanced intent-based routing system...")
     
     # Load configuration
     config = Config()
@@ -86,7 +86,7 @@ async def main():
         )
     ]
     
-    # Create orchestrator with BreathlessSymphony name
+    # Create orchestrator with enhanced routing
     orchestrator = Orchestrator(
         provider=provider,
         agents=agents,
@@ -94,37 +94,52 @@ async def main():
     )
     
     ui.separator()
-    ui.status("All systems operational", "success")
-    ui.status("Agents loaded: File Operative, Recon Specialist, Research Agent, Exploit Specialist", "info")
-    ui.status("NEW: Scope tracking enabled for penetration testing", "info")
-    ui.status("NEW: Full exploitation pipeline ready", "info")
+    ui.status("Enhanced intent-based routing system operational", "success")
+    ui.status("Agents: File Operative, Recon Specialist, Web Intelligence, Exploit Specialist", "info")
+    ui.status("NEW: Intelligent intent analysis replaces keyword matching", "info")
+    ui.status("NEW: Multi-agent coordination for complex workflows", "info")
     ui.separator(thin=True)
     
-    # Show example commands with scope management and exploitation
+    # Show enhanced examples demonstrating intelligent routing
     examples = [
-        # Scope management examples
-        "show scope",
-        "add 192.168.1.1 to scope",
-        "clear scope",
+        "# Intent-Based Routing Examples:",
         "",
-        # Operation examples with scope context
-        "List the files in my directory",
-        "Conduct reconnaissance on target.com", 
-        "Perform a light port scan on 192.168.1.0/24",
-        "Search for CVE-2023-1234 exploits",
-        "Search for Apache 2.4.49 vulnerabilities",
+        "# General conversation (handled directly):",
+        "How are you doing today?",
+        "What can you help me with?",
         "",
-        # NEW: Exploitation examples
-        "Find and download exploits for CVE-2021-44228",
-        "Get Apache HTTP Server exploits from exploit-db", 
-        "Execute exploit against targets in scope",
-        "Set up listener and run reverse shell exploit",
-        "Find Log4j exploits and execute against scoped targets"
+        "# Web research (web_search_agent):",
+        "What are the latest cybersecurity trends in 2025?",
+        "Find information about CVE-2024-1234",
+        "Research Apache HTTP Server vulnerabilities",
+        "",
+        "# File operations (file_agent):",
+        "Show me the contents of my config directory",
+        "Create a new script file called scanner.py",
+        "Find all log files modified in the last week",
+        "",
+        "# Network reconnaissance (recon_agent):",
+        "Perform a port scan on 192.168.1.1",
+        "Enumerate services on the target network",
+        "Check if ports 80 and 443 are open on example.com",
+        "",
+        "# Exploitation workflow (exploit_agent):",
+        "Download exploits for Apache path traversal",
+        "Find and execute CVE-2021-44228 proof of concept",
+        "Set up a listener and run reverse shell exploit",
+        "",
+        "# Multi-agent workflows (coordinated execution):",
+        "Scan network 192.168.1.0/24 and save results to a file",
+        "Research CVE-2023-1234, download exploits, and test them",
+        "Find the latest Log4j vulnerabilities and check my system",
+        "Perform reconnaissance on target.com and document findings"
     ]
     
-    print(f"{ui.colors['dim']}Example commands:{ui.colors['reset']}")
+    print(f"{ui.colors['dim']}Enhanced Examples (Intent-Based Routing):{ui.colors['reset']}")
     for example in examples:
-        if example == "":
+        if example.startswith("#"):
+            print(f"{ui.colors['info']}{example}{ui.colors['reset']}")
+        elif example == "":
             print()
         else:
             print(f"{ui.colors['dim']}  • {example}{ui.colors['reset']}")
@@ -147,7 +162,7 @@ async def main():
             
             if user_input.lower() == 'clear':
                 ui.clear_screen()
-                ui.header("BreathlessSymphony", "Autonomous Penetration Testing Framework")
+                ui.header("BreathlessSymphony", "Autonomous Penetration Testing Framework v2.0")
                 ui.footer_help()
                 continue
                 
@@ -157,46 +172,62 @@ async def main():
                     "quit/exit/bye - Exit the program",
                     "clear - Clear the screen", 
                     "help - Show this help message",
+                    "status - Show current system status",
                     "",
-                    "Scope Management:",
+                    "INTELLIGENT ROUTING:",
+                    "  The system now uses AI to understand your intent instead of keywords",
+                    "  Simply describe what you want to accomplish naturally",
+                    "",
+                    "AUTOMATIC AGENT SELECTION:",
+                    "  • Web research: 'Find information about...', 'What are the latest...'",
+                    "  • File operations: 'Show me files...', 'Create a script...'", 
+                    "  • Network recon: 'Scan the network...', 'Check if port 80...'",
+                    "  • Exploitation: 'Download exploits for...', 'Test CVE-2023...'",
+                    "",
+                    "MULTI-AGENT WORKFLOWS:",
+                    "  Complex tasks automatically use multiple agents:",
+                    "  • 'Scan network and save results' → recon + file agents",
+                    "  • 'Research CVE and test exploit' → web search + exploit agents",
+                    "  • 'Find vulnerabilities and document them' → multiple coordinated agents",
+                    "",
+                    "SCOPE MANAGEMENT:",
                     "  scope/show scope - Display current penetration test scope",
                     "  add <target> to scope - Add IP/domain/network to scope",
                     "  remove <target> from scope - Remove target from scope", 
                     "  clear scope - Clear all targets from scope",
                     "",
-                    "Agent capabilities:",
-                    "  File operations: create, read, search, bash commands",
-                    "  Reconnaissance: nmap, dig, whois, network scanning",
-                    "  Web search: find information, exploits, CVEs, research",
-                    "  Exploitation: download exploits, execute POCs, get shells",
-                    "",
-                    "Full Penetration Testing Workflow:",
-                    "  1. Add targets to scope: 'add 192.168.1.1 to scope'",
-                    "  2. Reconnaissance: 'scan the targets in scope'",
-                    "  3. Search exploits: 'find exploits for Apache 2.4.49'",
-                    "  4. Download & execute: 'get CVE-2021-44228 exploit and run it'",
-                    "  5. Get shells: 'execute reverse shell exploit against scope'",
-                    "  6. All agents automatically focus on scoped targets",
-                    "",
-                    "Exploitation Examples:",
-                    "  • 'find CVE-2021-44228 exploits'",
-                    "  • 'download Apache exploits from exploit-db'", 
-                    "  • 'execute exploit against 192.168.1.100'",
-                    "  • 'get reverse shell on targets in scope'",
-                    "  • 'set up listener and run exploit'"
+                    "NATURAL LANGUAGE EXAMPLES:",
+                    "  Instead of guessing keywords, just ask naturally:",
+                    "  'I need to find all configuration files on my system'",
+                    "  'Research the latest Apache vulnerabilities for me'",
+                    "  'Scan my lab network and create a report'",
+                    "  'Find CVE-2023-1234 exploits and test them safely'"
                 ]
                 for cmd in help_commands:
                     if cmd == "":
                         print()
+                    elif cmd.startswith("🧠") or cmd.startswith("🔄") or cmd.startswith("🚀") or cmd.startswith("📋") or cmd.startswith("💡"):
+                        print(f"{ui.colors['primary']}{cmd}{ui.colors['reset']}")
+                    elif cmd.startswith("  ✅"):
+                        print(f"{ui.colors['success']}{cmd}{ui.colors['reset']}")
                     else:
                         print(f"{ui.colors['info']}  {cmd}{ui.colors['reset']}")
+                ui.separator(thin=True)
+                continue
+            
+            if user_input.lower() == 'status':
+                status = orchestrator.get_status()
+                ui.separator()
+                ui.status("System Status:", "info")
+                for key, value in status.items():
+                    print(f"{ui.colors['dim']}  {key}: {value}{ui.colors['reset']}")
                 ui.separator(thin=True)
                 continue
             
             if not user_input:
                 continue
             
-            # Process request and time it
+            # Process request with enhanced routing and time it
             start_time = time.time()
             response = await orchestrator.process(user_input)
             end_time = time.time()
@@ -213,4 +244,5 @@ async def main():
             ui.error_box("Unexpected Error", str(e))
 
 if __name__ == "__main__":
+    print(f"{ui.colors['info']}🚀 Starting BreathlessSymphony v2.0 with Enhanced Intent Routing...{ui.colors['reset']}")
     asyncio.run(main())
