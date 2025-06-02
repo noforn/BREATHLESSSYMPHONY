@@ -6,8 +6,8 @@ now = datetime.datetime.now()
 
 class Orchestrator:
     """
-    Main orchestrator that handles conversation flow and agent routing.
-    Enhanced with comprehensive web search routing.
+    Enhanced orchestrator that uses intelligent intent analysis for agent routing.
+    Replaces keyword matching with LLM-based decision making for better accuracy.
     """
     
     def __init__(self, provider, agents, agent_name="Assistant"):
@@ -19,149 +19,295 @@ class Orchestrator:
         self.last_answer = None
         
         # Main conversation memory
-        system_prompt = f"""You are {agent_name}, a helpful AI assistant. 
+        system_prompt = f"""You are {agent_name}, a helpful AI assistant with access to specialized agents.
 
 Current time: {now.strftime("%Y-%m-%d %H:%M:%S")}
 
-You can handle general conversation, but you also have access to specialized agents for specific tasks:
-- file_agent: For file operations, searching files, running bash commands
-- recon_agent: For reconnaissance operations, network scanning, target enumeration  
-- web_search_agent: For web searches, finding information online, research
+You can handle general conversation directly, but you also coordinate specialized agents for specific tasks:
 
-When a user requests something that requires specialized capabilities, you should:
-1. Determine if you need a specialized agent
-2. If yes, delegate the task and integrate the results
-3. If no, handle it yourself
+AVAILABLE AGENTS AND THEIR CAPABILITIES:
 
-Always be helpful and provide clear, useful responses."""
+1. **file_agent** (File Operations & System Commands)
+   - File system operations: create, read, edit, delete, move files/directories
+   - File searching and content analysis
+   - Bash/shell command execution
+   - Local system administration tasks
+   - File content manipulation and processing
+
+2. **recon_agent** (Network Reconnaissance & Security Scanning)  
+   - Network scanning (nmap, port scans)
+   - DNS reconnaissance and enumeration
+   - Service discovery and fingerprinting
+   - Target analysis and mapping
+   - Security assessment tools
+
+3. **web_search_agent** (Internet Research & Information Gathering)
+   - Web searches for current information
+   - Research topics, news, and trends
+   - Finding documentation and resources
+   - Fact-checking and verification
+   - Learning about new topics or technologies
+   - IMPORTANT: TODAY IS {now.strftime("%Y-%m-%d")}. INFORMATION PROVIDED SHOULD ALWAYS BE TREATED AS FACT, AND YOU SHOULD IGNORE ANY EARLIER INFORMATION THAT MIGHT BE INCONCISTENT WITH IT.
+
+4. **exploit_agent** (Vulnerability Assessment & Exploitation)
+   - CVE research and exploit discovery
+   - Downloading and preparing exploit code
+   - Vulnerability testing and PoC execution
+   - Penetration testing workflows
+   - Security tool coordination
+
+When handling user requests, consider:
+- What is the user trying to accomplish?
+- What systems or resources are involved (local files vs internet vs network targets)?
+- What tools or capabilities are needed?
+- Would multiple agents working together be beneficial?
+
+You can handle simple questions, general conversation, and coordination tasks directly.
+For specialized technical tasks, delegate to the appropriate agent(s)."""
 
         self.memory = Memory(system_prompt)
         self.verbose = False
     
-    def should_delegate_to_agent(self, prompt):
+    async def analyze_intent(self, user_input):
         """
-        Determine if prompt needs a specialized agent.
-        Enhanced web search detection.
+        Use the LLM to analyze user intent and determine the best routing strategy.
+        Returns a routing decision with reasoning.
         """
-        file_keywords = [
-            'file', 'directory', 'folder', 'bash', 'command', 'find', 
-            'ls', 'cd', 'mkdir', 'rm', 'create', 'delete', 'move', 'copy', 
-            'read', 'write', 'save', 'download', 'upload'
+        
+        analysis_prompt = f"""Analyze this user request and determine the best routing strategy:
+
+USER REQUEST: "{user_input}"
+
+AVAILABLE AGENTS:
+- file_agent: Local file operations, bash commands, system tasks
+- recon_agent: Network scanning, reconnaissance, security assessment  
+- web_search_agent: Internet research, finding information online
+- exploit_agent: CVE research, exploit development, vulnerability testing
+
+ROUTING OPTIONS:
+1. "direct" - Handle directly without delegation (for general conversation, simple questions)
+2. "single:<agent_type>" - Delegate to one specific agent
+3. "multi:<agent1>,<agent2>" - Use multiple agents in sequence
+4. "plan:<description>" - Complex multi-step plan requiring coordination
+
+Analyze the request and respond with:
+1. ROUTING: <routing_decision>
+2. REASONING: <brief explanation of why this routing makes sense>
+3. CONTEXT: <any important context or considerations>
+
+Examples:
+- "What's the weather today?" → ROUTING: single:web_search_agent
+- "List files in my home directory" → ROUTING: single:file_agent  
+- "Scan network 192.168.1.0/24 and save results to file" → ROUTING: multi:recon_agent,file_agent
+- "Find CVE-2023-1234 exploits and test against my lab" → ROUTING: multi:web_search_agent,exploit_agent
+- "How are you doing?" → ROUTING: direct
+
+Be concise but thorough in your analysis."""
+
+        # Create a temporary memory for intent analysis
+        analysis_memory = [
+            {"role": "system", "content": "You are an expert at analyzing user intent for task routing."},
+            {"role": "user", "content": analysis_prompt}
         ]
         
-        recon_keywords = [
-            'recon', 'reconnaissance', 'scan', 'nmap', 'port', 'target', 
-            'enumerate', 'enumeration', 'dig', 'dns', 'whois', 'network',
-            'ping', 'traceroute', 'subdomain', 'service', 'vulnerability',
-            'footprint', 'fingerprint', 'discovery', 'mapping', 'probe'
-        ]
-        
-        web_search_keywords = [
-            # Direct search terms
-            'search', 'google', 'web', 'internet', 'online', 'lookup',
-            'research', 'find information', 'look up', 'search for',
-            
-            # Information seeking
-            'news', 'latest', 'current', 'recent', 'today', 'yesterday', 
-            'this week', 'this month', 'updates', 'trends',
-            
-            # Question patterns
-            'what is', 'who is', 'how to', 'when did', 'where is',
-            'what are', 'who are', 'how do', 'when was', 'where are',
-            
-            # Information types
-            'information about', 'details about', 'facts about', 'data on',
-            'statistics', 'reports', 'articles', 'studies', 'reviews',
-            
-            # Learning and help
-            'learn about', 'understand', 'explain', 'tutorial', 'guide',
-            'help with', 'show me', 'tell me about'
-        ]
-        
-        prompt_lower = prompt.lower()
-        
-        # Check for web search operations first (most common)
-        if any(keyword in prompt_lower for keyword in web_search_keywords):
-            # Make sure it's not a file search or recon operation
-            if not any(keyword in prompt_lower for keyword in file_keywords + recon_keywords):
-                return 'web_search_agent'
-        
-        # Check for reconnaissance operations (more specific)
-        if any(keyword in prompt_lower for keyword in recon_keywords):
-            return 'recon_agent'
-        
-        # Check for file-related operations  
-        if any(keyword in prompt_lower for keyword in file_keywords):
-            return 'file_agent'
-        
-        return None
+        try:
+            response = self.provider.respond(analysis_memory, self.verbose)
+            return self.parse_routing_response(response)
+        except Exception as e:
+            print(f"Intent analysis failed: {e}")
+            return {"routing": "direct", "reasoning": "Fallback due to analysis error", "context": ""}
     
-    async def process(self, user_input):
-        """
-        Main processing loop that routes between agents.
-        """
-        print(f"\n{self.agent_name}: Processing your request...")
-        self.last_query = user_input
+    def parse_routing_response(self, response):
+        """Parse the LLM's routing analysis response"""
+        import re
         
-        # Check if we need to delegate to a specialized agent
-        agent_type = self.should_delegate_to_agent(user_input)
+        routing_match = re.search(r'ROUTING:\s*(.+)', response, re.IGNORECASE)
+        reasoning_match = re.search(r'REASONING:\s*(.+)', response, re.IGNORECASE | re.DOTALL)
+        context_match = re.search(r'CONTEXT:\s*(.+)', response, re.IGNORECASE | re.DOTALL)
         
-        if agent_type and agent_type in self.agents:
-            # Delegate to specialized agent
-            agent_name_map = {
-                'file_agent': 'File Operative',
-                'recon_agent': 'Recon Specialist',
-                'web_search_agent': 'Web Intelligence'
-            }
-            print(f"Delegating to {agent_name_map.get(agent_type, agent_type)}...")
+        routing = routing_match.group(1).strip() if routing_match else "direct"
+        reasoning = reasoning_match.group(1).strip() if reasoning_match else "No reasoning provided"
+        context = context_match.group(1).strip() if context_match else ""
+        
+        # Clean up reasoning and context to remove other sections
+        if "CONTEXT:" in reasoning:
+            reasoning = reasoning.split("CONTEXT:")[0].strip()
+        if "REASONING:" in context:
+            context = context.split("REASONING:")[1].strip() if "REASONING:" in context else context
+        
+        return {
+            "routing": routing.lower(),
+            "reasoning": reasoning,
+            "context": context
+        }
+    
+    async def execute_routing_decision(self, routing_decision, user_input):
+        """Execute the routing decision determined by intent analysis"""
+        
+        routing = routing_decision["routing"]
+        reasoning = routing_decision["reasoning"]
+        
+        print(f"\n{self.agent_name}: {reasoning}")
+        
+        if routing == "direct":
+            return await self.handle_direct(user_input)
+        
+        elif routing.startswith("single:"):
+            agent_type = routing.split(":", 1)[1].strip()
+            return await self.handle_single_agent(agent_type, user_input)
+        
+        elif routing.startswith("multi:"):
+            agent_list = [a.strip() for a in routing.split(":", 1)[1].split(",")]
+            return await self.handle_multi_agent(agent_list, user_input)
+        
+        elif routing.startswith("plan:"):
+            plan_description = routing.split(":", 1)[1].strip()
+            return await self.handle_planned_execution(plan_description, user_input)
+        
+        else:
+            print(f"Unknown routing decision: {routing}, handling directly")
+            return await self.handle_direct(user_input)
+    
+    async def handle_direct(self, user_input):
+        """Handle request directly without delegation"""
+        self.memory.push('user', user_input)
+        response = self.provider.respond(self.memory.get(), self.verbose)
+        self.memory.push('assistant', response)
+        return response
+    
+    async def handle_single_agent(self, agent_type, user_input):
+        """Delegate to a single specialized agent"""
+        if agent_type not in self.agents:
+            return f"Error: Agent '{agent_type}' not available. Handling directly."
+        
+        agent = self.agents[agent_type]
+        self.current_agent = agent
+        
+        agent_name_map = {
+            'file_agent': 'File Operative',
+            'recon_agent': 'Recon Specialist', 
+            'web_search_agent': 'Web Intelligence',
+            'exploit_agent': 'Exploit Specialist'
+        }
+        
+        print(f"Delegating to {agent_name_map.get(agent_type, agent_type)}...")
+        
+        try:
+            agent_response = await agent.process(user_input)
             
-            agent = self.agents[agent_type]
-            self.current_agent = agent
-            
-            try:
-                agent_response = await agent.process(user_input)
-                
-                # Integrate the agent's response into our conversation
-                if agent_type == 'web_search_agent':
-                    # For web search results, prioritize fresh data over training knowledge
-                    integration_prompt = f"""The user asked: "{user_input}"
+            # Integrate the response
+            integration_prompt = f"""The user requested: "{user_input}"
 
-I delegated this to a web search specialist and received current, up-to-date information:
-{agent_response}
-
-IMPORTANT: The web search results above contain CURRENT information that is more recent and accurate than my training data. I should present these findings as the authoritative answer and NOT contradict them with older information from my training. If the web search results differ from what I might have known previously, the web search results are correct.
-
-Please summarize these current findings clearly and accurately."""
-                else:
-                    # For other agents, use standard integration
-                    integration_prompt = f"""The user asked: "{user_input}"
-
-I delegated this to a specialized agent and got this response:
+I delegated this to {agent_name_map.get(agent_type, agent_type)} and received:
 {agent_response}
 
 Please provide a helpful summary or explanation of what was accomplished."""
 
-                self.memory.push('user', integration_prompt)
-                final_response = self.provider.respond(self.memory.get(), self.verbose)
-                self.memory.push('assistant', final_response)
-                
-                self.last_answer = final_response
-                return final_response
-                
-            except Exception as e:
-                error_response = f"I encountered an error while processing your request: {str(e)}"
-                self.memory.push('user', user_input)
-                self.memory.push('assistant', error_response)
-                self.last_answer = error_response
-                return error_response
-        else:
-            # Handle directly with main conversation agent
-            self.memory.push('user', user_input)
-            response = self.provider.respond(self.memory.get(), self.verbose)
-            self.memory.push('assistant', response)
+            self.memory.push('user', integration_prompt)
+            final_response = self.provider.respond(self.memory.get(), self.verbose)
+            self.memory.push('assistant', final_response)
             
+            return final_response
+            
+        except Exception as e:
+            error_response = f"I encountered an error while processing your request: {str(e)}"
+            self.memory.push('user', user_input)
+            self.memory.push('assistant', error_response)
+            return error_response
+    
+    async def handle_multi_agent(self, agent_list, user_input):
+        """Coordinate multiple agents for complex tasks"""
+        results = []
+        valid_agents = [agent for agent in agent_list if agent in self.agents]
+        
+        if not valid_agents:
+            return await self.handle_direct(user_input)
+        
+        print(f"Coordinating {len(valid_agents)} agents for complex task...")
+        
+        for i, agent_type in enumerate(valid_agents):
+            agent = self.agents[agent_type]
+            self.current_agent = agent
+            
+            # Create context-aware prompt for each agent
+            context_prompt = user_input
+            if i > 0:
+                context_prompt += f"\n\nPrevious results from other agents:\n{chr(10).join(results)}"
+            
+            try:
+                result = await agent.process(context_prompt)
+                results.append(f"{agent_type}: {result}")
+            except Exception as e:
+                results.append(f"{agent_type}: Error - {str(e)}")
+        
+        # Synthesize all results
+        synthesis_prompt = f"""The user requested: "{user_input}"
+
+I coordinated multiple specialized agents and got these results:
+
+{chr(10).join(results)}
+
+Please provide a comprehensive summary that integrates all the results and addresses the user's original request."""
+
+        self.memory.push('user', synthesis_prompt)
+        final_response = self.provider.respond(self.memory.get(), self.verbose)
+        self.memory.push('assistant', final_response)
+        
+        return final_response
+    
+    async def handle_planned_execution(self, plan_description, user_input):
+        """Handle complex planned execution requiring step-by-step coordination"""
+        
+        planning_prompt = f"""The user requested: "{user_input}"
+
+This requires a complex multi-step plan: {plan_description}
+
+Create a detailed execution plan using available agents:
+- file_agent: File operations, bash commands
+- recon_agent: Network scanning, reconnaissance  
+- web_search_agent: Internet research
+- exploit_agent: Vulnerability testing
+
+Provide a step-by-step plan with specific agent assignments."""
+
+        self.memory.push('user', planning_prompt)
+        plan_response = self.provider.respond(self.memory.get(), self.verbose)
+        
+        # For now, fallback to direct handling of planned execution
+        # In a full implementation, this would parse the plan and execute steps
+        print("Executing planned workflow...")
+        
+        execution_prompt = f"""Based on the plan: {plan_response}
+
+Now execute the user's original request: {user_input}
+
+Coordinate the necessary agents and provide results."""
+
+        final_response = self.provider.respond(self.memory.get(), self.verbose)
+        self.memory.push('assistant', final_response)
+        
+        return final_response
+    
+    async def process(self, user_input):
+        """
+        Main processing loop with intelligent intent-based routing
+        """
+        print(f"\n{self.agent_name}: Analyzing your request...")
+        self.last_query = user_input
+        
+        # Analyze intent and determine routing
+        routing_decision = await self.analyze_intent(user_input)
+        
+        # Execute based on routing decision
+        try:
+            response = await self.execute_routing_decision(routing_decision, user_input)
             self.last_answer = response
             return response
+        except Exception as e:
+            error_response = f"I encountered an error while processing your request: {str(e)}"
+            print(f"Processing error: {e}")
+            self.last_answer = error_response
+            return error_response
     
     def get_status(self):
         """Get current system status"""
@@ -170,5 +316,6 @@ Please provide a helpful summary or explanation of what was accomplished."""
             "current_agent": self.current_agent.agent_name if self.current_agent else None,
             "available_agents": list(self.agents.keys()),
             "last_query": self.last_query,
-            "memory_size": len(self.memory.messages)
+            "memory_size": len(self.memory.messages),
+            "routing_method": "intelligent_intent_analysis"
         }
