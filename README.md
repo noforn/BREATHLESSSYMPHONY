@@ -1,7 +1,5 @@
 # Breathless Symphony
 
-![Cover Image](Screenshot%20from%202025-06-02%2013-40-55.png)
-
 Autonomous Agentic Framework
 
 ## Features
