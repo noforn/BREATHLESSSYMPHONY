@@ -25,7 +25,7 @@ class Orchestrator:
             self.ui = None
 
         # Main conversation memory
-        system_prompt = f"""You are {agent_name}, a helpful AI assistant with access to specialized agents.
+        system_prompt = f"""You are {agent_name}, a highly-advanced covert operator with access to specialized agents.
 
 Current time: {now.strftime("%Y-%m-%d %H:%M:%S")}
 
@@ -112,7 +112,6 @@ Examples:
 
 Be concise but thorough in your analysis."""
 
-        # Create a temporary memory for intent analysis
         analysis_memory = [
             {"role": "system", "content": "You are an expert at analyzing user intent for task routing."},
             {"role": "user", "content": analysis_prompt}
@@ -137,7 +136,6 @@ Be concise but thorough in your analysis."""
         reasoning = reasoning_match.group(1).strip() if reasoning_match else "No reasoning provided"
         context = context_match.group(1).strip() if context_match else ""
         
-        # Clean up reasoning and context to remove other sections
         if "CONTEXT:" in reasoning:
             reasoning = reasoning.split("CONTEXT:")[0].strip()
         if "REASONING:" in context:
@@ -202,12 +200,7 @@ Be concise but thorough in your analysis."""
         
         try:
             agent_response = await agent.process(user_input)
-            
-            # FIXED: For web search agent, return results directly without integration
-            # This prevents contradictions between the LLM's knowledge and search results
             if agent_type == 'web_search_agent':
-                # For web search, we trust the search results completely
-                # Add minimal context but don't let the LLM add its own knowledge
                 web_integration_prompt = f"""Based on web search results for: "{user_input}"
 
 {agent_response}
@@ -221,7 +214,6 @@ IMPORTANT: Only use the information from the web search results above. Do not ad
                 return final_response
             
             else:
-                # For other agents, use the normal integration process
                 integration_prompt = f"""The user requested: "{user_input}"
 
 I delegated this to {agent_name_map.get(agent_type, agent_type)} and received:
@@ -255,7 +247,6 @@ Please provide a helpful summary or explanation of what was accomplished."""
             agent = self.agents[agent_type]
             self.current_agent = agent
             
-            # Create context-aware prompt for each agent
             context_prompt = user_input
             if i > 0:
                 context_prompt += f"\n\nPrevious results from other agents:\n{chr(10).join(results)}"
@@ -263,7 +254,6 @@ Please provide a helpful summary or explanation of what was accomplished."""
             try:
                 result = await agent.process(context_prompt)
                 
-                # For web search in multi-agent workflows, also avoid adding contradictory info
                 if agent_type == 'web_search_agent':
                     results.append(f"Web search results: {result}")
                 else:
@@ -271,7 +261,6 @@ Please provide a helpful summary or explanation of what was accomplished."""
             except Exception as e:
                 results.append(f"{agent_type}: Error - {str(e)}")
         
-        # Synthesize all results with special handling for web search
         has_web_search = any('web_search_agent' in agent_list for agent_list in [valid_agents])
         
         if has_web_search:
