@@ -281,8 +281,6 @@ Provide a step-by-step plan with specific agent assignments."""
         self.memory.push('user', planning_prompt)
         plan_response = self.provider.respond(self.memory.get(), self.verbose)
         
-        # For now, fallback to direct handling of planned execution
-        # In a full implementation, this would parse the plan and execute steps
         print("Executing planned workflow...")
         
         execution_prompt = f"""Based on the plan: {plan_response}
@@ -303,10 +301,8 @@ Coordinate the necessary agents and provide results."""
         print(f"\n{self.ui.colors['secondary']}{self.agent_name}: Analyzing your request...{self.ui.colors['reset']}")
         self.last_query = user_input
         
-        # Analyze intent and determine routing
         routing_decision = await self.analyze_intent(user_input)
         
-        # Execute based on routing decision
         try:
             response = await self.execute_routing_decision(routing_decision, user_input)
             self.last_answer = response

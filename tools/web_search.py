@@ -14,15 +14,11 @@ class WebSearch(Tools):
         self.tag = "web_search"
         self.name = "Web Search"
         self.description = "Performs web searches using DuckDuckGo"
-        
-        # Import UI for status messages
         try:
             from core.ui import ui
             self.ui = ui
         except ImportError:
             self.ui = None
-        
-        # Check for required packages
         try:
             from duckduckgo_search import DDGS
             self.DDGS = DDGS
@@ -36,14 +32,12 @@ class WebSearch(Tools):
         """Handle simple queries with immediate responses"""
         query_lower = query.lower().strip()
         
-        # Date queries
         if any(phrase in query_lower for phrase in [
             'current date', 'today date', 'what date', 'date today', 'todays date'
         ]):
             today = datetime.datetime.now()
             return f"Current Date: {today.strftime('%A, %B %d, %Y')}"
         
-        # Time queries  
         if any(phrase in query_lower for phrase in [
             'current time', 'what time', 'time now'
         ]):
@@ -61,7 +55,6 @@ class WebSearch(Tools):
             if self.ui:
                 self.ui.thinking(f"Searching: {query}")
             
-            # Use exact method from successful test
             results = self.DDGS().text(
                 keywords=query,
                 region='wt-wt',
@@ -73,14 +66,12 @@ class WebSearch(Tools):
             if not results:
                 return f"No search results found for: {query}"
             
-            # Format results cleanly
             formatted_results = []
             for i, result in enumerate(results[:5], 1):
                 title = result.get('title', 'No title')
                 href = result.get('href', 'No URL')
                 body = result.get('body', 'No description')
                 
-                # Trim long descriptions
                 if len(body) > 200:
                     body = body[:200] + "..."
                 
@@ -112,13 +103,11 @@ class WebSearch(Tools):
                 output += "Error: Empty search query\n"
                 continue
             
-            # Try built-in responses first
             builtin_response = self.handle_builtin_queries(query)
             if builtin_response:
                 output += f"{builtin_response}\n"
                 continue
             
-            # Perform web search
             search_result = self.search_ddg(query)
             output += f"Search results for '{query}':\n{search_result}\n"
         

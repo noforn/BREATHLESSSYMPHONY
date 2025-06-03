@@ -15,7 +15,6 @@ class FileFinder(Tools):
         self.name = "File Finder"
         self.description = "Finds files in the directory and returns their information."
         
-        # Import UI for better messaging
         try:
             from core.ui import ui
             self.ui = ui
@@ -91,7 +90,6 @@ class FileFinder(Tools):
         
         try:
             for root, dirs, files in os.walk(directory_path):
-                # Skip hidden directories for performance
                 dirs[:] = [d for d in dirs if not d.startswith('.')]
                 
                 for f in files:
@@ -99,7 +97,6 @@ class FileFinder(Tools):
                         continue
                     if any(excluded_file in f for excluded_file in excluded_files):
                         continue
-                    # Case-insensitive partial matching
                     if filename.strip().lower() in f.strip().lower():
                         return os.path.join(root, f)
         except Exception as e:

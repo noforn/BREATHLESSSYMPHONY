@@ -1,6 +1,3 @@
-# This is the same content as the first artifact "Enhanced CLI UI Module"
-# Save this file as: core/ui.py
-
 import os
 import sys
 from datetime import datetime
@@ -17,7 +14,6 @@ try:
     COLORAMA_AVAILABLE = True
 except ImportError:
     COLORAMA_AVAILABLE = False
-    # Fallback - no colors
     class MockColor:
         def __getattr__(self, name):
             return ""
@@ -39,20 +35,18 @@ class BreathlessUI:
                 try:
                     readline.read_history_file(self.history_file)
                 except Exception as e:
-                    # Could log this error if a logging mechanism exists
-                    pass # Ignore if history can't be read
+                    pass
 
-        # Stealth color scheme - muted, covert tones
         if COLORAMA_AVAILABLE:
             self.colors = {
-                'primary': Fore.MAGENTA,           # Muted cyan for agent
-                'secondary': Fore.LIGHTBLACK_EX, # Dark gray for borders
-                'success': Fore.GREEN,          # Muted green for success
-                'warning': Fore.YELLOW,         # Yellow for warnings  
-                'error': Fore.RED,              # Red for errors
-                'info': Fore.BLUE,              # Blue for info
-                'text': Fore.WHITE,             # White for main text
-                'dim': Fore.LIGHTBLACK_EX,      # Dim gray for secondary text
+                'primary': Fore.MAGENTA,           
+                'secondary': Fore.LIGHTBLACK_EX, 
+                'success': Fore.GREEN,          
+                'warning': Fore.YELLOW,         
+                'error': Fore.RED,              
+                'info': Fore.BLUE,              
+                'text': Fore.WHITE,             
+                'dim': Fore.LIGHTBLACK_EX,
                 'reset': Style.RESET_ALL
             }
         else:
@@ -75,7 +69,6 @@ class BreathlessUI:
         print()
         print(self._make_line("═", "secondary"))
         
-        # Center the title
         title_line = f" {title} "
         padding = (self.width - len(title_line)) // 2
         print(f"{self.colors['secondary']}{'═' * padding}{self.colors['primary']}{title_line}{self.colors['secondary']}{'═' * padding}{self.colors['reset']}")
@@ -118,8 +111,7 @@ class BreathlessUI:
                 try:
                     readline.write_history_file(self.history_file)
                 except Exception as e:
-                    # Could log this error if a logging mechanism exists
-                    pass # Ignore if history can't be written
+                    pass
             return user_command
         except Exception as e:
             self.status(f"Error in input: {e}", "error")
@@ -129,7 +121,6 @@ class BreathlessUI:
         """Display agent response with formatting"""
         print()
         
-        # Agent header with optional thinking time
         if thinking_time:
             time_info = f" ({thinking_time:.1f}s)"
         else:
@@ -139,7 +130,6 @@ class BreathlessUI:
         print(f"{self.colors['primary']}{header}{self.colors['reset']}")
         print(f"{self.colors['secondary']}{'─' * len(header)}{self.colors['reset']}")
         
-        # Message content with proper wrapping
         self._print_wrapped(message)
         print()
     
@@ -194,5 +184,4 @@ class BreathlessUI:
         print(f"{self.colors['dim']}{help_text}{self.colors['reset']}")
         print()
 
-# Global UI instance
 ui = BreathlessUI()
