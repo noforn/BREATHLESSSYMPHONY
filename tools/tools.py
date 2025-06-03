@@ -6,7 +6,6 @@ import re
 class Tools:
     """
     Abstract base class for all tools that agents can use.
-    Based on AgenticSeek's Tools class with block extraction and execution interface.
     """
     
     def __init__(self):
@@ -16,7 +15,6 @@ class Tools:
         self.work_dir = self.create_work_dir()
         self.executable_blocks_found = False
         
-        # Ensure work directory exists
         os.makedirs(self.work_dir, exist_ok=True)
     
     def create_work_dir(self):
@@ -87,7 +85,6 @@ class Tools:
                 
             content = llm_text[start_pos + len(start_tag):end_pos].strip()
             
-            # Handle file saving syntax like ```python:filename.py
             if ':' in content.split('\n')[0]:
                 save_path = content.split('\n')[0].split(':')[1].strip()
                 content = content[content.find('\n')+1:]
@@ -103,22 +100,16 @@ class Tools:
     
     def save_block(self, blocks, save_path):
         """Save code blocks to file"""
-        
         if save_path is None or not blocks:
             return
-            
         full_path = os.path.join(self.work_dir, save_path)
         directory = os.path.dirname(full_path)
-        
-        
         if directory and not os.path.exists(directory):
             os.makedirs(directory)
-            
         with open(full_path, 'w') as f:
             content = '\n'.join(blocks)
             f.write(content)
-        
-    
+
     @abstractmethod
     def execute(self, blocks: list, safety: bool = False) -> str:
         """Execute the tool with given blocks - must be implemented by subclasses"""
