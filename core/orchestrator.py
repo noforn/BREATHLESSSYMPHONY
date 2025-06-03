@@ -231,7 +231,7 @@ Please provide a helpful summary or explanation of what was accomplished."""
         if not valid_agents:
             return await self.handle_direct(user_input)
         
-        print(f"Coordinating {len(valid_agents)} agents for complex task...")
+        print(f"\n{self.ui.colors['primary']}{self.agent_name}: Calling {len(valid_agents)} agents to complete your task...{self.ui.colors['reset']}")
         
         for i, agent_type in enumerate(valid_agents):
             agent = self.agents[agent_type]

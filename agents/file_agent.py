@@ -3,6 +3,9 @@ from agents.base_agent import Agent
 from tools.file_finder import FileFinder
 from tools.bash_executor import BashExecutor
 from core.memory import Memory
+import datetime
+
+now = datetime.datetime.now()
 
 class FileAgent(Agent):
     """
@@ -48,7 +51,7 @@ class FileAgent(Agent):
         
         # Add work directory and tool usage context
         enhanced_prompt = f"""{prompt}
-
+Current time: {now.strftime("%Y-%m-%d %H:%M:%S")}
 You must work in directory: {self.work_dir}
 
 For file operations, you can use:

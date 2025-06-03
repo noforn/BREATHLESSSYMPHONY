@@ -2,6 +2,9 @@ import asyncio
 from agents.base_agent import Agent
 from tools.web_search import WebSearch
 from core.memory import Memory
+import datetime
+
+now = datetime.datetime.now()
 
 class WebSearchAgent(Agent):
     """
@@ -46,6 +49,8 @@ class WebSearchAgent(Agent):
         
         # Enhanced prompt with search context
         enhanced_prompt = f"""{prompt}
+
+Current time: {now.strftime("%Y-%m-%d %H:%M:%S")}
 
 For web searches, use web_search blocks:
 

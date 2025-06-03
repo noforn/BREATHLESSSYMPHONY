@@ -5,7 +5,6 @@ import httpx
 
 class OllamaProvider:
     """
-    Ollama LLM provider based on AgenticSeek's provider system.
     Handles local and remote Ollama connections with streaming support.
     """
     
