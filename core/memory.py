@@ -1,6 +1,3 @@
-# Enhanced version of core/memory.py
-# Add this to the existing Memory class or replace it
-
 import datetime
 import uuid
 from typing import List, Dict
@@ -16,11 +13,9 @@ class ScopeManager:
         self.domains: set = set()
         self.notes = {}
         
-        # Import regex here to avoid dependency issues
         import re
         import ipaddress
         
-        # Regex patterns for automatic detection
         self.ip_pattern = re.compile(
             r'\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b'
         )
@@ -32,32 +27,31 @@ class ScopeManager:
         )
         self.ipaddress = ipaddress
         
-        # Exclude patterns for domain detection (things that look like domains but aren't targets)
         self.exclude_patterns = [
-            r'.*\.txt$',           # Text files
-            r'.*\.log$',           # Log files  
-            r'.*\.xml$',           # XML files
-            r'.*\.json$',          # JSON files
-            r'.*\.csv$',           # CSV files
-            r'.*\.html?$',         # HTML files
-            r'.*\.php$',           # PHP files
-            r'.*\.js$',            # JavaScript files
-            r'.*\.css$',           # CSS files
-            r'.*\.py$',            # Python files
-            r'.*\.sh$',            # Shell scripts
-            r'.*\.conf$',          # Config files
-            r'.*\.cfg$',           # Config files
-            r'.*\.home$',          # Local network names
-            r'.*\.local$',         # Local network names
-            r'.*\.lan$',           # Local network names
-            r'localhost',          # Localhost
-            r'.*\.internal$',      # Internal domains
-            r'example\.com',       # Example domain
-            r'example\.org',       # Example domain
-            r'test\.com',          # Test domain
-            r'nmap\.org',          # Tool websites (not targets)
-            r'github\.com',        # Tool/reference sites
-            r'exploit-db\.com',    # Tool/reference sites
+            r'.*\.txt$',           
+            r'.*\.log$',           
+            r'.*\.xml$',           
+            r'.*\.json$',          
+            r'.*\.csv$',           
+            r'.*\.html?$',         
+            r'.*\.php$',           
+            r'.*\.js$',            
+            r'.*\.css$',           
+            r'.*\.py$',            
+            r'.*\.sh$',            
+            r'.*\.conf$',          
+            r'.*\.cfg$',           
+            r'.*\.home$',          
+            r'.*\.local$',         
+            r'.*\.lan$',           
+            r'localhost',          
+            r'.*\.internal$',      
+            r'example\.com',       
+            r'example\.org',       
+            r'test\.com',          
+            r'nmap\.org',          
+            r'github\.com',        
+            r'exploit-db\.com',    
         ]
     
     def is_excluded_domain(self, domain: str) -> bool:
@@ -74,23 +68,19 @@ class ScopeManager:
         """Check if domain is a valid target (not a filename or tool reference)"""
         domain_lower = domain.lower().strip()
         
-        # Must have at least 2 parts
         if len(domain_lower.split('.')) < 2:
             return False
         
-        # Check against exclusion patterns
         if self.is_excluded_domain(domain_lower):
             return False
         
-        # Must have valid TLD (at least 2 characters)
         tld = domain_lower.split('.')[-1]
         if len(tld) < 2:
             return False
         
-        # Exclude domains that look like filenames or paths
         if ('/' in domain_lower or 
             domain_lower.endswith(('.txt', '.log', '.xml', '.json', '.html', '.php', '.js', '.css', '.py', '.sh', '.conf', '.cfg')) or
-            '-' in tld):  # TLDs shouldn't have hyphens
+            '-' in tld): 
             return False
             
         return True
@@ -99,16 +89,13 @@ class ScopeManager:
         """Automatically detect and add IPs, domains, networks from text - RESTRICTIVE VERSION"""
         added = []
         
-        # Find networks first (they contain IPs)
         networks = self.network_pattern.findall(text)
         for network in networks:
             if self.add_network(network):
                 added.append(f"Network: {network}")
         
-        # Find IPs (exclude those in networks)
         ips = self.ip_pattern.findall(text)
         for ip in ips:
-            # Skip if IP is part of a network we already added
             skip = False
             for network in networks:
                 try:
@@ -121,10 +108,8 @@ class ScopeManager:
             if not skip and self.add_target(ip):
                 added.append(f"IP: {ip}")
         
-        # Find domains with strict validation
         potential_domains = self.domain_pattern.findall(text)
         for domain in potential_domains:
-            # Apply strict validation
             if (not self.ip_pattern.match(domain) and 
                 self.is_valid_target_domain(domain)):
                 if self.add_domain(domain):
@@ -230,14 +215,12 @@ class Memory:
     """
     
     def __init__(self, system_prompt, max_history=50):
-        # Existing functionality - unchanged
         self.system_prompt = system_prompt
         self.messages = [{"role": "system", "content": system_prompt}]
         self.max_history = max_history
         self.session_time = datetime.datetime.now()
         self.session_id = str(uuid.uuid4())
         
-        # NEW: Add scope tracking
         self.scope = ScopeManager()
     
     def push(self, role, content, auto_add_to_scope: bool = True):
@@ -249,19 +232,16 @@ class Memory:
             'time': time_str
         })
         
-        # NEW: Auto-detect scope items in user messages
         if auto_add_to_scope and role == 'user':
             detected = self.scope.auto_detect_and_add(content)
             if detected:
-                # Optionally log scope additions
                 try:
                     from core.ui import ui
-                    for item in detected:
-                        ui.status(f"Added to scope: {item}", "info")
+                    #for item in detected:
+                    #    ui.status(f"Added to scope: {item}", "info")
                 except ImportError:
                     pass
         
-        # Keep only recent messages (but always keep system prompt)
         if len(self.messages) > self.max_history:
             self.messages = [self.messages[0]] + self.messages[-(self.max_history-1):]
         
@@ -269,14 +249,11 @@ class Memory:
     
     def get(self):
         """Get all messages for LLM in OpenAI format with scope context"""
-        # Get base messages
         messages = [{"role": msg["role"], "content": msg["content"]} for msg in self.messages]
         
-        # NEW: Add scope context to system prompt if scope exists
         if not self.scope.is_empty():
             scope_context = f"\n\nCURRENT PENETRATION TEST SCOPE:\n{self.scope.get_scope_summary()}\n\nAlways consider the current scope when performing operations. Focus reconnaissance and testing efforts on targets within scope."
             
-            # Modify system message to include scope
             if messages and messages[0]["role"] == "system":
                 messages[0]["content"] += scope_context
         
@@ -285,7 +262,6 @@ class Memory:
     def clear(self):
         """Clear history but keep system prompt and scope"""
         self.messages = [self.messages[0]]
-        # Note: Scope persists unless explicitly cleared
     
     def get_session_info(self):
         """Get session information including scope"""
@@ -295,7 +271,6 @@ class Memory:
             "message_count": len(self.messages) - 1
         }
         
-        # NEW: Add scope information
         base_info["scope_targets"] = len(self.scope.get_all_targets())
         base_info["scope_summary"] = self.scope.get_scope_summary() if not self.scope.is_empty() else "No scope set"
         
