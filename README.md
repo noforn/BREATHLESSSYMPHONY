@@ -1,4 +1,4 @@
-# Breathless Symphony v2.0
+# BreathlessSymphony v2.1.2
 An Autonomous Agentic Framework with Enhanced Intent-Based Routing.
 
 ## Features
@@ -10,35 +10,36 @@ An Autonomous Agentic Framework with Enhanced Intent-Based Routing.
     *   **WebSearchAgent**: Conducts internet research, gathers information online, and fetches current data.
     *   **ExploitAgent**: Handles vulnerability assessment, including CVE research, exploit discovery, download, and preparation.
 *   **Multi-Agent Coordination**: Capable of orchestrating complex workflows by combining the strengths of multiple agents.
-*   **Ollama Integration**: Leverages Ollama for powerful Language Model capabilities, allowing for flexible model choices.
+*   **Ollama Integration**: Leverages Ollama ease-of-use with local models, ensuring privacy and negating dependency on external services.
 *   **Interactive Command-Line Interface (CLI)**: Offers a user-friendly CLI with rich, colored output, status updates, and easy interaction.
-*   **Scope Management**: Allows users to define and manage a penetration testing scope (targets, networks) for focused operations.
+*   **Scope Management (v1.5)**: Allows users to define and manage a penetration testing scope (targets, networks) for focused operations.
 *   **Configuration Management**: Uses `config.ini` for managing project settings, with sensible defaults provided in `config.py`.
-*   **Directory Structure Management**: Automatically creates necessary directories for project organization.
-*   **Prompt Management**: Generates initial prompt files for agents.
-*   **Dependency Management**: Creates a `requirements.txt` file.
+*   **Directory Structure Management**: Automatically creates necessary directories for agent and framework organization.
+*   **Prompt Management**: Easily configure and modify each agent's system prompt(s).
 
 ## Getting Started
 
-To get started with Breathless Symphony:
+To get started with BreathlessSymphony:
 
 1.  **Ensure Ollama is Running**:
     Open a terminal and start the Ollama service:
     ```bash
     ollama serve
     ```
-    Keep this terminal window open while using Breathless Symphony.
+    Alternatively, allow Ollama to run in the background. This framework will handle the connection.
 
 2.  **Pull an Ollama Model**:
-    You need a model compatible with Ollama. The default model is `gemma3:27b` (configurable in `config.ini`). Pull it using:
+    You need a model compatible with Ollama. It must support function calling. Default model is `gemma3:27b` (configurable in `config.ini`). Pull it using:
     ```bash
     ollama pull gemma3:27b
     ```
     (Replace `gemma3:27b` if you've configured a different model).
 
 3.  **Install Dependencies**:
-    Navigate to the project directory and install the required Python packages:
+    Navigate to the project directory, set up a virtual environment, and install the required Python packages:
     ```bash
+    python -m venv venv
+    source venv/bin/activate
     pip install -r requirements.txt
     ```
 
@@ -62,7 +63,7 @@ The project uses a `config.ini` file to manage configurations. If the file doesn
 
 ## Usage
 
-Breathless Symphony is designed for intuitive interaction through its command-line interface. You interact with the main orchestrator, "BreathlessSymphony," which then intelligently routes your requests to the appropriate specialized agent.
+BreathlessSymphony is designed for intuitive interaction through its command-line interface. You interact with the main orchestrator, which then intelligently routes your requests to the appropriate specialized agent(s) and reports back to you.
 
 ### Interacting with Agents
 
@@ -92,7 +93,7 @@ Simply type your request in natural language. The system will analyze your inten
 
 ### Multi-Agent Workflows
 
-For more complex tasks, Breathless Symphony can coordinate multiple agents:
+For more complex tasks, BreathlessSymphony can coordinate multiple agents:
 
 *   `Scan network 192.168.1.0/24 and save results to a file.` (Uses `ReconAgent` and `FileAgent`)
 *   `Research CVE-2023-1234, download exploits, and test them.` (Uses `WebSearchAgent` and `ExploitAgent`)
