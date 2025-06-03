@@ -1,0 +1,6 @@
+__pycache__/
+.logs/
+core/__pycache__/
+agents/__pycache__/
+tools/__pycache__/
+env/
