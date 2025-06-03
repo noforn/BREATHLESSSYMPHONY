@@ -1,6 +1,8 @@
 # BreathlessSymphony v2.1.2
 An Autonomous Agentic Framework with Intent-Based Routing.
 
+![“Diagram”](framework.png)
+
 ## Features
 
 *   **Intelligent Intent-Based Routing (v2.0)**: Automatically analyzes user requests and delegates tasks to the most suitable specialized agent or combination of agents.
