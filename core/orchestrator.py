@@ -18,6 +18,12 @@ class Orchestrator:
         self.last_query = None
         self.last_answer = None
         
+        try:
+            from core.ui import ui
+            self.ui = ui
+        except ImportError:
+            self.ui = None
+
         # Main conversation memory
         system_prompt = f"""You are {agent_name}, a helpful AI assistant with access to specialized agents.
 
@@ -93,9 +99,9 @@ ROUTING OPTIONS:
 4. "plan:<description>" - Complex multi-step plan requiring coordination
 
 Analyze the request and respond with:
-1. ROUTING: <routing_decision>
-2. REASONING: <brief explanation of why this routing makes sense>
-3. CONTEXT: <any important context or considerations>
+- ROUTING: <routing_decision>
+- REASONING: <brief explanation of why this routing makes sense>
+- CONTEXT: <any important context or considerations>
 
 Examples:
 - "What's the weather today?" → ROUTING: single:web_search_agent
@@ -149,7 +155,7 @@ Be concise but thorough in your analysis."""
         routing = routing_decision["routing"]
         reasoning = routing_decision["reasoning"]
         
-        print(f"\n{self.agent_name}: {reasoning}")
+        print(f"\n{self.ui.colors['secondary']}{self.agent_name}: {reasoning}{self.ui.colors['reset']}")
         
         if routing == "direct":
             return await self.handle_direct(user_input)
@@ -294,7 +300,7 @@ Coordinate the necessary agents and provide results."""
         """
         Main processing loop with intelligent intent-based routing
         """
-        print(f"\n{self.agent_name}: Analyzing your request...")
+        print(f"\n{self.ui.colors['secondary']}{self.agent_name}: Analyzing your request...{self.ui.colors['reset']}")
         self.last_query = user_input
         
         # Analyze intent and determine routing
