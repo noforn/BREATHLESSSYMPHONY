@@ -138,7 +138,7 @@ Breathless Symphony utilizes a suite of specialized agents to handle diverse tas
         *   Downloading exploit code from sources like Exploit-DB and GitHub.
         *   Assisting in the analysis and preparation of downloaded exploits.
         *   Guiding the setup of listeners and execution of exploits against targets within the defined scope.
-        *   **Note**: Always operates with strict adherence to safety and scope limitations.
+        *   **Note**: Does not always operates with strict adherence to safety and scope limitations.
 
 ## Tools Supporting the Agents
 
