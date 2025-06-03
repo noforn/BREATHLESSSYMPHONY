@@ -28,7 +28,7 @@ class BreathlessUI:
     def __init__(self):
         self.width = self._get_terminal_width()
         self.readline_available = READLINE_AVAILABLE
-        self.commands = ["bye", "exit", "clear", "help", "search", "list"]
+        self.commands = ["bye", "exit", "clear", "help", "search", "list", "scan", "download", "create", "execute"]
         
         if self.readline_available:
             readline.set_completer(self._completer)
