@@ -20,7 +20,7 @@ async def main():
     ui.clear_screen()
     ui.header("BreathlessSymphony", "Autonomous Penetration Testing Framework v2.0")
     
-    ui.system_message("Initializing enhanced intent-based routing system...")
+    ui.system_message("Initializing routing system...")
     
     # Load configuration
     config = Config()
@@ -94,32 +94,29 @@ async def main():
     )
     
     ui.separator()
-    ui.status("Enhanced intent-based routing system operational", "success")
+    ui.status("All Systems Operational", "success")
     ui.status("Agents: File Operative, Recon Specialist, Web Intelligence, Exploit Specialist", "info")
-    ui.status("NEW: Intelligent intent analysis replaces keyword matching", "info")
-    ui.status("NEW: Multi-agent coordination for complex workflows", "info")
     ui.separator(thin=True)
     
     # Show enhanced examples demonstrating intelligent routing
     examples = [
-        "# Intent-Based Routing Examples:",
         "",
         "# General conversation (handled directly):",
         "How are you doing today?",
         "What can you help me with?",
         "",
         "# Web research (web_search_agent):",
-        "What are the latest cybersecurity trends in 2025?",
+        "What is the weather like in NYC today?",
         "Find information about CVE-2024-1234",
-        "Research Apache HTTP Server vulnerabilities",
+        "Research Apache HTTP Server 4.4.49 and summarize",
         "",
         "# File operations (file_agent):",
-        "Show me the contents of my config directory",
+        "List files in your directory",
         "Create a new script file called scanner.py",
-        "Find all log files modified in the last week",
+        "Execute bash: echo hello",
         "",
         "# Network reconnaissance (recon_agent):",
-        "Perform a port scan on 192.168.1.1",
+        "Perform a light scan on 192.168.1.1",
         "Enumerate services on the target network",
         "Check if ports 80 and 443 are open on example.com",
         "",
@@ -131,11 +128,11 @@ async def main():
         "# Multi-agent workflows (coordinated execution):",
         "Scan network 192.168.1.0/24 and save results to a file",
         "Research CVE-2023-1234, download exploits, and test them",
-        "Find the latest Log4j vulnerabilities and check my system",
-        "Perform reconnaissance on target.com and document findings"
+        "Find the latest linux kernel vulnerabilities and check my system",
+        "Search for latest information about Ukraine and summarize in a new file",
     ]
     
-    print(f"{ui.colors['dim']}Enhanced Examples (Intent-Based Routing):{ui.colors['reset']}")
+    print(f"{ui.colors['dim']}Usage Examples:{ui.colors['reset']}")
     for example in examples:
         if example.startswith("#"):
             print(f"{ui.colors['info']}{example}{ui.colors['reset']}")
@@ -244,5 +241,5 @@ async def main():
             ui.error_box("Unexpected Error", str(e))
 
 if __name__ == "__main__":
-    print(f"{ui.colors['info']}🚀 Starting BreathlessSymphony v2.0 with Enhanced Intent Routing...{ui.colors['reset']}")
+    print(f"{ui.colors['info']}Starting BreathlessSymphony...{ui.colors['reset']}")
     asyncio.run(main())
