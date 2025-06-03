@@ -1,5 +1,5 @@
 # BreathlessSymphony v2.1.2
-An Autonomous Agentic Framework with Enhanced Intent-Based Routing.
+An Autonomous Agentic Framework with Intent-Based Routing.
 
 ## Features
 
