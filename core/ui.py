@@ -45,7 +45,7 @@ class BreathlessUI:
         # Stealth color scheme - muted, covert tones
         if COLORAMA_AVAILABLE:
             self.colors = {
-                'primary': Fore.CYAN,           # Muted cyan for agent
+                'primary': Fore.MAGENTA,           # Muted cyan for agent
                 'secondary': Fore.LIGHTBLACK_EX, # Dark gray for borders
                 'success': Fore.GREEN,          # Muted green for success
                 'warning': Fore.YELLOW,         # Yellow for warnings  
@@ -111,7 +111,7 @@ class BreathlessUI:
     
     def user_input(self, prompt="You"):
         """Get user input with styled prompt"""
-        prompt_text = f"{self.colors['text']}{prompt}: {self.colors['reset']}"
+        prompt_text = f"{self.colors['info']}{prompt}: {self.colors['reset']}"
         try:
             user_command = input(prompt_text).strip()
             if self.readline_available:
