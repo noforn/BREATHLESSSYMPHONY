@@ -203,19 +203,37 @@ Be concise but thorough in your analysis."""
         try:
             agent_response = await agent.process(user_input)
             
-            # Integrate the response
-            integration_prompt = f"""The user requested: "{user_input}"
+            # FIXED: For web search agent, return results directly without integration
+            # This prevents contradictions between the LLM's knowledge and search results
+            if agent_type == 'web_search_agent':
+                # For web search, we trust the search results completely
+                # Add minimal context but don't let the LLM add its own knowledge
+                web_integration_prompt = f"""Based on web search results for: "{user_input}"
+
+{agent_response}
+
+IMPORTANT: Only use the information from the web search results above. Do not add any additional information from your training data that might contradict these current search results. Simply present the findings from the search in a clear, helpful format."""
+
+                self.memory.push('user', web_integration_prompt)
+                final_response = self.provider.respond(self.memory.get(), self.verbose)
+                self.memory.push('assistant', final_response)
+                
+                return final_response
+            
+            else:
+                # For other agents, use the normal integration process
+                integration_prompt = f"""The user requested: "{user_input}"
 
 I delegated this to {agent_name_map.get(agent_type, agent_type)} and received:
 {agent_response}
 
 Please provide a helpful summary or explanation of what was accomplished."""
 
-            self.memory.push('user', integration_prompt)
-            final_response = self.provider.respond(self.memory.get(), self.verbose)
-            self.memory.push('assistant', final_response)
-            
-            return final_response
+                self.memory.push('user', integration_prompt)
+                final_response = self.provider.respond(self.memory.get(), self.verbose)
+                self.memory.push('assistant', final_response)
+                
+                return final_response
             
         except Exception as e:
             error_response = f"I encountered an error while processing your request: {str(e)}"
@@ -244,12 +262,28 @@ Please provide a helpful summary or explanation of what was accomplished."""
             
             try:
                 result = await agent.process(context_prompt)
-                results.append(f"{agent_type}: {result}")
+                
+                # For web search in multi-agent workflows, also avoid adding contradictory info
+                if agent_type == 'web_search_agent':
+                    results.append(f"Web search results: {result}")
+                else:
+                    results.append(f"{agent_type}: {result}")
             except Exception as e:
                 results.append(f"{agent_type}: Error - {str(e)}")
         
-        # Synthesize all results
-        synthesis_prompt = f"""The user requested: "{user_input}"
+        # Synthesize all results with special handling for web search
+        has_web_search = any('web_search_agent' in agent_list for agent_list in [valid_agents])
+        
+        if has_web_search:
+            synthesis_prompt = f"""The user requested: "{user_input}"
+
+I coordinated multiple specialized agents and got these results:
+
+{chr(10).join(results)}
+
+IMPORTANT: If web search results are included above, prioritize that current information over any conflicting information from your training data. Present a comprehensive summary that integrates all results, giving precedence to the most current web search data."""
+        else:
+            synthesis_prompt = f"""The user requested: "{user_input}"
 
 I coordinated multiple specialized agents and got these results:
 
