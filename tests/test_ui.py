@@ -1,6 +1,7 @@
 import unittest
 import os
 import sys
+from unittest.mock import patch
 
 # Add the parent directory to sys.path to allow imports from 'core'
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -112,6 +113,43 @@ class TestUIHistory(unittest.TestCase):
         
         self.assertIn(dummy_command_1, loaded_history, "First dummy command not loaded into history.")
         self.assertIn(dummy_command_2, loaded_history, "Second dummy command not loaded into history.")
+
+class TestUIAutocomplete(unittest.TestCase):
+    def setUp(self):
+        self.ui = BreathlessUI()
+        # Commands are: ["bye", "exit", "clear", "help", "search", "list"]
+
+    @unittest.skipIf(not READLINE_AVAILABLE, "Readline not available, skipping set_completer test")
+    def test_readline_setup_if_available(self):
+        with unittest.mock.patch('core.ui.readline') as mock_readline:
+            # Re-initialize UI to trigger readline setup within the context of the mock
+            ui_instance = BreathlessUI()
+            mock_readline.set_completer.assert_called_once_with(ui_instance._completer)
+            mock_readline.parse_and_bind.assert_called_once_with('tab: complete')
+
+    def test_completer_logic(self):
+        # Test direct calls to _completer
+        self.assertEqual(self.ui._completer("h", 0), "help")
+        self.assertEqual(self.ui._completer("he", 0), "help")
+        self.assertEqual(self.ui._completer("help", 0), "help")
+
+        self.assertEqual(self.ui._completer("l", 0), "list")
+        self.assertEqual(self.ui._completer("li", 0), "list")
+        self.assertEqual(self.ui._completer("lis", 0), "list")
+
+        self.assertEqual(self.ui._completer("ex", 0), "exit")
+        self.assertIsNone(self.ui._completer("ex", 1)) # No other command starts with "ex"
+
+        self.assertEqual(self.ui._completer("s", 0), "search") # "search"
+        self.assertIsNone(self.ui._completer("s", 1)) # No other command starts with "s" that would be second
+
+        self.assertEqual(self.ui._completer("", 0), "bye") # First command
+        self.assertEqual(self.ui._completer("", 1), "exit") # Second command
+        self.assertEqual(self.ui._completer("", 5), "list") # Last command
+        self.assertIsNone(self.ui._completer("", 6)) # Index out of bounds
+
+        self.assertIsNone(self.ui._completer("nonexistent", 0))
+        self.assertIsNone(self.ui._completer(" help", 0)) # Test with leading space (should not match)
 
 
 if __name__ == '__main__':

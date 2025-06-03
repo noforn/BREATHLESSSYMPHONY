@@ -28,8 +28,11 @@ class BreathlessUI:
     def __init__(self):
         self.width = self._get_terminal_width()
         self.readline_available = READLINE_AVAILABLE
+        self.commands = ["bye", "exit", "clear", "help", "search", "list"]
         
         if self.readline_available:
+            readline.set_completer(self._completer)
+            readline.parse_and_bind('tab: complete')
             self.history_file = os.path.expanduser("~/.breathless_history")
             if os.path.exists(self.history_file):
                 try:
@@ -51,6 +54,13 @@ class BreathlessUI:
             }
         else:
             self.colors = {k: "" for k in ['primary', 'secondary', 'success', 'warning', 'error', 'info', 'text', 'dim', 'reset']}
+
+    def _completer(self, text, state):
+        options = [cmd for cmd in self.commands if cmd.startswith(text)]
+        if state < len(options):
+            return options[state]
+        else:
+            return None
     
     def _get_terminal_width(self):
         """Get terminal width, fallback to 80"""
